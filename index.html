@@ -37,13 +37,13 @@
             font-size: 20px;
             margin-bottom: 20px;
         }
-        .question-container {
+        .question-container, .start-container {
             background-color: white;
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 80%;
-            max-width: 500px;
+            max-width: 600px;
         }
         .question {
             font-size: 20px;
@@ -54,51 +54,101 @@
             flex-direction: column;
             gap: 10px;
         }
-        .options button {
+        .options button, .start-btn {
             padding: 10px;
             font-size: 16px;
             cursor: pointer;
         }
-        .submit-btn {
+        .submit-btn, .start-btn {
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 18px;
             cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
         }
         .timer {
             font-size: 18px;
             margin-top: 10px;
             color: red;
         }
+        .start-container h1 {
+            color: #333;
+        }
+        .start-container p {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .player-selection {
+            margin-bottom: 20px;
+        }
+        .player-selection label {
+            margin-right: 10px;
+        }
+        #player-count {
+            padding: 5px;
+            font-size: 16px;
+        }
+        .options button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            transition: background-color 0.3s;
+        }
+        .options button.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
     </style>
 </head>
 <body>
-
-    <!-- Navigation Bar -->
-    <div class="navbar">
-        <a href="#" onclick="startGame()">Start Game</a>
+    <!-- Start Page Container -->
+    <div class="start-container" id="start-container">
+        <h1>Machine Learning Quiz Game</h1>
+        <p><strong>Machine Learning</strong> is a branch of artificial intelligence that uses data and algorithms to mimic human learning, gradually improving its accuracy.</p>
+        <p><strong>Supervised learning</strong> is a method of training models using labeled data, while <strong>unsupervised learning</strong> discovers patterns from unlabeled data.</p>
+        <p><strong>Neural networks</strong> are computational models inspired by the human brain, widely used in deep learning.</p>
+        <p><strong>Classification</strong> and <strong>regression</strong> are two common supervised learning tasks, used for predicting categories and continuous values respectively.</p>
+        <div class="player-selection">
+            <label for="player-count">Select number of players:</label>
+            <select id="player-count">
+                <option value="1">1 Player</option>
+                <option value="2">2 Players</option>
+                <option value="3">3 Players</option>
+                <option value="4">4 Players</option>
+            </select>
+        </div>
+        <button class="start-btn" onclick="showGame()">Start Game</button>
     </div>
 
-    <!-- Scoreboard for all players -->
-    <div class="scoreboard" id="scoreboard">
-        Player 1: 100 | Player 2: 100 | Player 3: 100
-    </div>
+    <!-- Game Container (Initially Hidden) -->
+    <div id="game-container" style="display: none;">
+        <!-- Navigation Bar -->
+        <div class="navbar">
+            <a href="#" onclick="restartGame()">Restart</a>
+        </div>
 
-    <!-- Question and options container -->
-    <div class="question-container" id="question-container">
-        <div class="question" id="question">Press "Start Game" to begin</div>
-        <div class="options" id="options"></div>
-        <button class="submit-btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
-        <div class="timer" id="timer"></div>
+        <!-- Scoreboard for all players -->
+        <div class="scoreboard" id="scoreboard">
+            Player 1: 100 | Player 2: 100 | Player 3: 100
+        </div>
+
+        <!-- Question and options container -->
+        <div class="question-container" id="question-container">
+            <div class="question" id="question">Press "Start Game" to begin</div>
+            <div class="options" id="options"></div>
+            <button class="submit-btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+            <div class="timer" id="timer"></div>
+        </div>
     </div>
 
     <script>
         // Initialize game variables
-        let players = [
-            { name: "Player 1", score: 100 },
-            { name: "Player 2", score: 100 },
-            { name: "Player 3", score: 100 }
-        ];
+        let players = [];
         let currentPlayer = 0;
         let selectedAnswer = null;
         let shuffledQuestions = [];
@@ -136,16 +186,21 @@
 
         // Start the game: reset variables, shuffle questions, and load the first question
         function startGame() {
-            players = [
-                { name: "Player 1", score: 100 },
-                { name: "Player 2", score: 100 },
-                { name: "Player 3", score: 100 }
-            ];
+            const playerCount = parseInt(document.getElementById('player-count').value);
+            players = [];
+            for (let i = 1; i <= playerCount; i++) {
+                players.push({ name: `Player ${i}`, score: 100 });
+            }
             currentPlayer = 0;
-            document.getElementById('scoreboard').innerText = 
-                `Player 1: 100 | Player 2: 100 | Player 3: 100`;
+            updateScoreboard();
             shuffleQuestions();
             loadQuestion();
+        }
+
+        // Update scoreboard display
+        function updateScoreboard() {
+            const scoreboardText = players.map(player => `${player.name}: ${player.score}`).join(' | ');
+            document.getElementById('scoreboard').innerText = scoreboardText;
         }
 
         // Load the current question and start timer
@@ -199,6 +254,13 @@
         function selectOption(index) {
             selectedAnswer = index;
             document.getElementById('submit-btn').disabled = false;
+            
+            // Remove 'selected' class from all option buttons
+            const optionButtons = document.querySelectorAll('.options button');
+            optionButtons.forEach(button => button.classList.remove('selected'));
+            
+            // Add 'selected' class to the clicked button
+            optionButtons[index].classList.add('selected');
         }
 
         // Submit the selected answer, update score, and load next question
@@ -222,8 +284,20 @@
         // Deduct points for wrong answers or timeout
         function deductPoints() {
             players[currentPlayer].score -= 10;
-            document.getElementById('scoreboard').innerText = 
-                `Player 1: ${players[0].score} | Player 2: ${players[1].score} | Player 3: ${players[2].score}`;
+            updateScoreboard();
+        }
+
+        // 显示游戏界面
+        function showGame() {
+            document.getElementById('start-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            startGame();
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            document.getElementById('start-container').style.display = 'block';
+            document.getElementById('game-container').style.display = 'none';
         }
     </script>
 </body>
