@@ -601,25 +601,34 @@
         }
 
         function getAIResponse(message) {
-            // 检测输入语言
-            const isEnglish = /^[A-Za-z\s.,!?]+$/.test(message);
+            // 将消息转换为小写以便于匹配
+            const lowerMessage = message.toLowerCase();
             
-            // 根据语言选择回复
-            const responses = isEnglish ? [
-                "That's an interesting question!",
-                "I understand your point. Let's discuss it further.",
-                "Based on my understanding, this issue might involve several aspects.",
-                "You've raised a good point. I suggest we look at it from the following angles:",
-                "This is indeed a complex issue, but we can try to simplify it."
-            ] : [
-                "这是一个很有趣的问题！",
-                "我理解你的观点，让我们进一步探讨一下。",
-                "根据我的理解，这个问题可能涉及到多个方面。",
-                "你提出了一个很好的观点，我建议我们从以下几个角度来看：",
-                "这个问题确实很复杂，但我们可以尝试简化它。"
-            ];
+            // 检测语言
+            const isEnglish = /^[a-z\s.,!?]+$/.test(lowerMessage);
             
-            return responses[Math.floor(Math.random() * responses.length)];
+            // 根据语言和内容选择回复
+            if (isEnglish) {
+                if (lowerMessage.includes('hi') || lowerMessage.includes('hello')) {
+                    return "Hello! How can I assist you today?";
+                } else if (lowerMessage.includes('how are you')) {
+                    return "I'm functioning well, thank you for asking. How may I help you?";
+                } else if (lowerMessage.includes('bye') || lowerMessage.includes('goodbye')) {
+                    return "Goodbye! Have a great day!";
+                } else {
+                    return "I'm sorry, I didn't quite understand that. Could you please rephrase or ask me something else?";
+                }
+            } else {
+                if (lowerMessage.includes('你好') || lowerMessage.includes('嗨')) {
+                    return "你好！今天我能为你做些什么呢？";
+                } else if (lowerMessage.includes('你好吗') || lowerMessage.includes('最近如何')) {
+                    return "我运行良好,谢谢关心。我能为你提供什么帮助吗？";
+                } else if (lowerMessage.includes('再见') || lowerMessage.includes('拜拜')) {
+                    return "再见！祝你有美好的一天！";
+                } else {
+                    return "抱歉,我没有完全理解你的意思。你能换个方式表达或问我点别的吗？";
+                }
+            }
         }
 
         // 为输入框添加回车键发送消息的功能
