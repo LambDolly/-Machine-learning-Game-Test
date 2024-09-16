@@ -6,44 +6,93 @@
     <title>Machine Learning Group Quiz Game</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh;
             margin: 0;
-            background-color: #f4f4f4;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1a4a7a; /* 更柔和的蓝色 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.015)' stroke-width='1'%3E%3Cpath d='M0 0h300v300H0z'/%3E%3Cpath d='M50 25h200v250H50z'/%3E%3Ccircle cx='150' cy='150' r='100'/%3E%3Cpath d='M25 75h250M25 225h250M75 25v250M225 25v250'/%3E%3Cpath d='M100 100h100v100H100z' stroke-dasharray='5,5'/%3E%3Cpath d='M50 150s25-25 50-25 50 25 75 25 50-25 75-25'/%3E%3C/g%3E%3Cg fill='rgba(255,255,255,0.025)'%3E%3Ccircle cx='25' cy='25' r='2'/%3E%3Ccircle cx='75' cy='75' r='2'/%3E%3Ccircle cx='125' cy='125' r='2'/%3E%3Ccircle cx='175' cy='175' r='2'/%3E%3Ccircle cx='225' cy='225' r='2'/%3E%3Ccircle cx='275' cy='275' r='2'/%3E%3C/g%3E%3Cpath d='M0 50 L300 50 M50 0 L50 300 M100 0 L100 300 M200 0 L200 300 M250 0 L250 300 M0 150 L300 150 M0 200 L300 200' stroke='rgba(255,255,255,0.01)' stroke-width='1'/%3E%3Cpath d='M0 0 L300 300 M300 0 L0 300' stroke='rgba(255,255,255,0.005)' stroke-width='1'/%3E%3C/svg%3E");
+            background-size: 300px 300px;
         }
+
         .navbar {
-            width: 100%;
-            background-color: #333;
-            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1000; /* 增加 z-index 确保导航栏在最上层 */
         }
-        .navbar a {
-            float: left;
-            display: block;
-            color: #f2f2f2;
-            text-align: center;
-            padding: 14px 16px;
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+        }
+
+        .navbar a, .navbar .dropbtn {
+            color: white;
             text-decoration: none;
-            font-size: 17px;
+            padding: 10px 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
-        .navbar a:hover {
-            background-color: #ddd;
-            color: black;
+
+        .navbar a:hover, .navbar .dropbtn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
         }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.9);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            overflow: hidden;
+            top: 100%; /* 确保下拉菜单在导航项下方 */
+            left: 0; /* 与导航项左对齐 */
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
         .scoreboard {
             font-size: 20px;
             margin-bottom: 20px;
         }
         .question-container, .start-container {
-            background-color: white;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 80%;
             max-width: 600px;
+            position: relative;
+            z-index: 1;
+            margin: 20px auto;
         }
         .question {
             font-size: 20px;
@@ -103,9 +152,177 @@
             background-color: #4CAF50;
             color: white;
         }
+        .start-container, #game-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1; /* 确保游戏容器在背景之上，但在导航栏之下 */
+        }
+
+        #team-members {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .member {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .member-images {
+            display: flex;
+            flex-direction: column;
+            margin-right: 20px;
+        }
+
+        .member-images img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .member-info textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+
+        /* AI 聊天按钮样式 */
+        #ai-chat-button {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        /* AI 聊天对话框样式 */
+        #ai-chat-dialog {
+            display: none;
+            position: fixed;
+            right: 20px;
+            bottom: 90px;
+            width: 300px;
+            height: 400px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #ai-chat-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #ai-chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #ai-chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        #ai-chat-input {
+            display: flex;
+            padding: 10px;
+        }
+
+        #ai-chat-input input {
+            flex-grow: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        #ai-chat-input button {
+            margin-left: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .ai-message, .user-message {
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+
+        .ai-message {
+            background-color: #f0f0f0;
+            align-self: flex-start;
+        }
+
+        .user-message {
+            background-color: #4CAF50;
+            color: white;
+            align-self: flex-end;
+        }
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" onclick="showHome()">Home</a>
+            <div class="dropdown">
+                <a href="#" class="dropbtn">About we</a>
+                <div class="dropdown-content">
+                    <a href="#personal">？？？</a>
+                    <a href="#experience">？？？</a>
+                    <a href="#education">？？？</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="dropbtn">Game List 🎮</a>
+                <div class="dropdown-content">
+                    <a href="#game1">Machine learning test</a>
+                    <a href="#game2">Not now</a>
+                    <a href="#game3">Not now</a>
+                </div>
+            </div>
+            <a href="#" onclick="showTeamMembers()">Producing members</a>
+        </div>
+    </nav>
+
     <!-- Start Page Container -->
     <div class="start-container" id="start-container">
         <h1>Machine Learning Quiz Game</h1>
@@ -119,7 +336,6 @@
                 <option value="1">1 Player</option>
                 <option value="2">2 Players</option>
                 <option value="3">3 Players</option>
-                <option value="4">4 Players</option>
             </select>
         </div>
         <button class="start-btn" onclick="showGame()">Start Game</button>
@@ -143,6 +359,44 @@
             <div class="options" id="options"></div>
             <button class="submit-btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
             <div class="timer" id="timer"></div>
+        </div>
+    </div>
+
+    <div id="team-members" style="display: none;">
+        <h2>Production member/About</h2>
+        <div class="member">
+            <div class="member-images">
+                <img src="avatar1.jpg" alt="成员1头像">
+                <img src="/Users/apple/Downloads/IMG_6194.JPG" alt="Member 1 Photos成员1照片">
+            </div>
+            <div class="member-info">
+                <textarea placeholder="请输入成员1的自我介绍"></textarea>
+            </div>
+        </div>
+        <div class="member">
+            <div class="member-images">
+                <img src="avatar2.jpg" alt="成员2头像">
+                <img src="photo2.jpg" alt="成员2照片">
+            </div>
+            <div class="member-info">
+                <textarea placeholder="请输入成员2的自我介绍"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 聊天按钮 -->
+    <button id="ai-chat-button" onclick="toggleAIChat()">AI</button>
+
+    <!-- AI 聊天对话框 -->
+    <div id="ai-chat-dialog" style="display: none;">
+        <div id="ai-chat-header">
+            AI 助手
+            <button id="ai-chat-close" onclick="toggleAIChat()">×</button>
+        </div>
+        <div id="ai-chat-messages"></div>
+        <div id="ai-chat-input">
+            <input type="text" id="ai-chat-input-text" placeholder="输入消息...">
+            <button onclick="sendMessage()">发送</button>
         </div>
     </div>
 
@@ -287,18 +541,93 @@
             updateScoreboard();
         }
 
-        // 显示游戏界面
+        // Show game interface
         function showGame() {
             document.getElementById('start-container').style.display = 'none';
             document.getElementById('game-container').style.display = 'block';
+            document.getElementById('team-members').style.display = 'none';
             startGame();
         }
 
-        // 重新开始游戏
+        // Restart game
         function restartGame() {
             document.getElementById('start-container').style.display = 'block';
             document.getElementById('game-container').style.display = 'none';
+            document.getElementById('team-members').style.display = 'none';
         }
+
+        function showHome() {
+            document.getElementById('start-container').style.display = 'block';
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('team-members').style.display = 'none';
+        }
+
+        function showTeamMembers() {
+            document.getElementById('start-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('team-members').style.display = 'block';
+        }
+
+        // 确保页面加载时显示首页
+        window.onload = showHome;
+
+        // AI 聊天功能
+        function toggleAIChat() {
+            const dialog = document.getElementById('ai-chat-dialog');
+            dialog.style.display = dialog.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('ai-chat-input-text');
+            const message = input.value.trim();
+            if (message) {
+                addMessage('user', message);
+                input.value = '';
+                // 模拟 AI 响应
+                setTimeout(() => {
+                    const aiResponse = getAIResponse(message);
+                    addMessage('ai', aiResponse);
+                }, 1000);
+            }
+        }
+
+        function addMessage(sender, message) {
+            const messagesContainer = document.getElementById('ai-chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+            messageElement.textContent = message;
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function getAIResponse(message) {
+            // 检测输入语言
+            const isEnglish = /^[A-Za-z\s.,!?]+$/.test(message);
+            
+            // 根据语言选择回复
+            const responses = isEnglish ? [
+                "That's an interesting question!",
+                "I understand your point. Let's discuss it further.",
+                "Based on my understanding, this issue might involve several aspects.",
+                "You've raised a good point. I suggest we look at it from the following angles:",
+                "This is indeed a complex issue, but we can try to simplify it."
+            ] : [
+                "这是一个很有趣的问题！",
+                "我理解你的观点，让我们进一步探讨一下。",
+                "根据我的理解，这个问题可能涉及到多个方面。",
+                "你提出了一个很好的观点，我建议我们从以下几个角度来看：",
+                "这个问题确实很复杂，但我们可以尝试简化它。"
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // 为输入框添加回车键发送消息的功能
+        document.getElementById('ai-chat-input-text').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
     </script>
 </body>
 </html>
